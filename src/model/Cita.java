@@ -3,21 +3,20 @@ package model;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Clase que representa una cita médica en la clínica
- */
+// Clase que representa una cita médica en la clínica
+// Relaciona a una mascota, un dueño y un veterinario en una fecha/hora específica
 public class Cita {
+    // Atributos privados (encapsulamiento)
     private String id;
-    private LocalDateTime fechaHora;
-    private String motivo;
-    private Mascota mascota;
-    private Dueno dueno;
-    private Veterinario veterinario;
-    private String estado; // Programada, Completada, Cancelada
+    private LocalDateTime fechaHora; // Fecha y hora de la cita
+    private String motivo; // Motivo de la consulta
+    private Mascota mascota; // Mascota que será atendida
+    private Dueno dueno; // Dueño de la mascota
+    private Veterinario veterinario; // Veterinario que atenderá
+    private String estado; // Estado de la cita: Programada, Completada, Cancelada
     
-    /**
-     * Constructor de la clase Cita
-     */
+    // Constructor de la clase Cita
+    // Inicializa todas las relaciones y el estado predeterminado
     public Cita(String id, LocalDateTime fechaHora, String motivo, Mascota mascota, 
                 Dueno dueno, Veterinario veterinario) {
         this.id = id;
@@ -26,10 +25,12 @@ public class Cita {
         this.mascota = mascota;
         this.dueno = dueno;
         this.veterinario = veterinario;
+        // Estado inicial de toda cita nueva
         this.estado = "Programada";
     }
     
-    // Getters y Setters
+    // ===== GETTERS Y SETTERS (Encapsulamiento) =====
+    
     public String getId() {
         return id;
     }
@@ -86,8 +87,11 @@ public class Cita {
         this.estado = estado;
     }
     
+    // Sobrescribe el método toString() para representación en texto
+    // Formatea la fecha/hora en formato legible (dd/MM/yyyy HH:mm)
     @Override
     public String toString() {
+        // Crear formateador de fecha personalizado
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         return "Cita{" +
                 "id='" + id + '\'' +

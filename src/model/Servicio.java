@@ -2,20 +2,19 @@ package model;
 
 import java.time.LocalDate;
 
-/**
- * Clase que representa un servicio ofrecido por la clínica
- */
+// Clase que representa un servicio ofrecido por la clínica
+// Por ejemplo: consulta, vacunación, cirugía, etc.
 public class Servicio {
+    // Atributos privados (encapsulamiento)
     private String id;
     private String nombre;
     private String descripcion;
     private double precio;
-    private Mascota mascota;
-    private LocalDate fechaRealizado;
+    private Mascota mascota; // Mascota a la que se le aplicó el servicio (opcional)
+    private LocalDate fechaRealizado; // Fecha en que se realizó (opcional)
     
-    /**
-     * Constructor de la clase Servicio
-     */
+    // Constructor básico de la clase Servicio
+    // Usado para definir servicios en el catálogo
     public Servicio(String id, String nombre, String descripcion, double precio) {
         this.id = id;
         this.nombre = nombre;
@@ -23,9 +22,8 @@ public class Servicio {
         this.precio = precio;
     }
     
-    /**
-     * Constructor sobrecargado con mascota y fecha
-     */
+    // Constructor sobrecargado con mascota y fecha
+    // Usado cuando el servicio se aplica a una mascota específica
     public Servicio(String id, String nombre, String descripcion, double precio, 
                     Mascota mascota, LocalDate fechaRealizado) {
         this.id = id;
@@ -36,7 +34,8 @@ public class Servicio {
         this.fechaRealizado = fechaRealizado;
     }
     
-    // Getters y Setters
+    // ===== GETTERS Y SETTERS (Encapsulamiento) =====
+    
     public String getId() {
         return id;
     }
@@ -85,13 +84,14 @@ public class Servicio {
         this.fechaRealizado = fechaRealizado;
     }
     
-    /**
-     * Aplica un descuento al servicio
-     */
+    // Aplica un descuento al servicio según el porcentaje especificado
+    // Retorna el precio con descuento aplicado
     public double aplicarDescuento(double porcentaje) {
         return precio - (precio * porcentaje / 100);
     }
     
+    // Sobrescribe el método toString() para representación en texto
+    // Incluye información de la mascota y fecha si están disponibles
     @Override
     public String toString() {
         return "Servicio{" +

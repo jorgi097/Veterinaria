@@ -1,19 +1,17 @@
 package model;
 
-/**
- * Clase abstracta que representa un empleado de la clínica
- * Demuestra el uso de herencia y polimorfismo
- */
+// Clase abstracta que representa un empleado de la clínica
+// Demuestra el uso de abstracción y herencia (clase base para Veterinario y Asistente)
 public abstract class Empleado {
+    // Atributos privados (encapsulamiento)
     private String id;
     private String nombre;
     private String correo;
     private String telefono;
     private String horario;
     
-    /**
-     * Constructor de la clase abstracta Empleado
-     */
+    // Constructor de la clase abstracta Empleado
+    // Inicializa los atributos comunes a todos los empleados
     public Empleado(String id, String nombre, String correo, String telefono, String horario) {
         this.id = id;
         this.nombre = nombre;
@@ -22,7 +20,9 @@ public abstract class Empleado {
         this.horario = horario;
     }
     
-    // Getters y Setters
+    // ===== GETTERS Y SETTERS (Encapsulamiento) =====
+    // Permiten acceso controlado a los atributos privados
+    
     public String getId() {
         return id;
     }
@@ -63,19 +63,18 @@ public abstract class Empleado {
         this.horario = horario;
     }
     
-    /**
-     * Método abstracto que debe ser implementado por las subclases
-     * Demuestra polimorfismo
-     */
+    // Método abstracto que debe ser implementado por las subclases
+    // Demuestra polimorfismo: cada tipo de empleado tiene su propia implementación
     public abstract String realizarTarea();
     
-    /**
-     * Método común para todos los empleados
-     */
+    // Método común para todos los empleados
+    // Retorna información básica del empleado
     public String obtenerInformacion() {
         return "ID: " + id + ", Nombre: " + nombre + ", Horario: " + horario;
     }
     
+    // Sobrescribe el método toString de Object
+    // Retorna representación en texto del empleado
     @Override
     public String toString() {
         return "Empleado{" +
