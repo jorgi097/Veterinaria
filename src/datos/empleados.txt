@@ -1,0 +1,4 @@
+VET|V002|Dr. Pedro Sánchez|pedro@clinica.com|555-1002|Lun-Vie 14:00-22:00|Medicina General
+VET|V001|Dr. Ana Martínez|ana@clinica.com|555-1001|Lun-Vie 8:00-16:00|Cirugía
+ASI|A001|Laura Torres|laura@clinica.com|555-2001|Lun-Vie 8:00-16:00|Recepción
+ASI|A002|Miguel Ríos|miguel@clinica.com|555-2002|Lun-Vie 14:00-22:00|Asistencia Quirúrgica
