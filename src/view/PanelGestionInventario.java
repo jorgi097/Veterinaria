@@ -310,7 +310,7 @@ public class PanelGestionInventario extends JPanel {
         mensaje.append("Los siguientes productos necesitan reabastecimiento:\n\n");
         
         for (Producto prod : productosConStockBajo) {
-            mensaje.append("• ").append(prod.getNombre())
+            mensaje.append("- ").append(prod.getNombre())
                    .append(" (").append(prod.getCategoria()).append(")")
                    .append(" - Cantidad actual: ").append(prod.getCantidad())
                    .append(" / Mínimo: ").append(prod.getCantidadMinima())

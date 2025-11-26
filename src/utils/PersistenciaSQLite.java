@@ -101,6 +101,14 @@ public class PersistenciaSQLite {
                 "descripcion TEXT," +
                 "precio REAL)";
         
+        // Tabla para relacionar citas con servicios (N:M)
+        String sqlCitaServicios = "CREATE TABLE IF NOT EXISTS cita_servicios (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "id_cita TEXT," +
+                "id_servicio TEXT," +
+                "FOREIGN KEY (id_cita) REFERENCES citas(id)," +
+                "FOREIGN KEY (id_servicio) REFERENCES servicios(id))";
+        
         try (Connection conn = conectar();
              Statement stmt = conn.createStatement()) {
             stmt.execute(sqlDuenos);
@@ -110,7 +118,8 @@ public class PersistenciaSQLite {
             stmt.execute(sqlCitas);
             stmt.execute(sqlProductos);
             stmt.execute(sqlServicios);
-            System.out.println("✅ Base de datos inicializada correctamente");
+            stmt.execute(sqlCitaServicios);
+            System.out.println("[OK] Base de datos inicializada correctamente");
         } catch (SQLException e) {
             System.err.println("Error al crear tablas: " + e.getMessage());
         }
@@ -128,7 +137,7 @@ public class PersistenciaSQLite {
         guardarCitas();
         guardarProductos();
         guardarServicios();
-        System.out.println("✅ Datos guardados en la base de datos");
+        System.out.println("[OK] Datos guardados en la base de datos");
     }
     
     private void guardarDuenos() {
@@ -224,10 +233,14 @@ public class PersistenciaSQLite {
     
     private void guardarCitas() {
         String sql = "INSERT OR REPLACE INTO citas (id, fecha_hora, motivo, id_mascota, id_dueno, id_veterinario, estado) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sqlBorrarServicios = "DELETE FROM cita_servicios WHERE id_cita = ?";
+        String sqlServicioCita = "INSERT INTO cita_servicios (id_cita, id_servicio) VALUES (?, ?)";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         
         try (Connection conn = conectar();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             PreparedStatement pstmtBorrar = conn.prepareStatement(sqlBorrarServicios);
+             PreparedStatement pstmtServicio = conn.prepareStatement(sqlServicioCita)) {
             
             List<Cita> citas = controller.listarCitas();
             for (Cita cita : citas) {
@@ -239,6 +252,16 @@ public class PersistenciaSQLite {
                 pstmt.setString(6, cita.getVeterinario().getId());
                 pstmt.setString(7, cita.getEstado());
                 pstmt.executeUpdate();
+                
+                // Guardar servicios de la cita
+                pstmtBorrar.setString(1, cita.getId());
+                pstmtBorrar.executeUpdate();
+                
+                for (Servicio servicio : cita.getServiciosRealizados()) {
+                    pstmtServicio.setString(1, cita.getId());
+                    pstmtServicio.setString(2, servicio.getId());
+                    pstmtServicio.executeUpdate();
+                }
             }
         } catch (SQLException e) {
             System.err.println("Error al guardar citas: " + e.getMessage());
@@ -294,10 +317,10 @@ public class PersistenciaSQLite {
         cargarDuenos();
         cargarMascotas();
         cargarEmpleados();
+        cargarServicios(); // Cargar servicios antes de citas
         cargarCitas();
         cargarProductos();
-        // Los servicios se inicializan en el controlador
-        System.out.println("✅ Datos cargados desde la base de datos");
+        System.out.println("[OK] Datos cargados desde la base de datos");
     }
     
     private void cargarDuenos() {
@@ -394,16 +417,19 @@ public class PersistenciaSQLite {
     
     private void cargarCitas() {
         String sql = "SELECT * FROM citas";
+        String sqlServicios = "SELECT id_servicio FROM cita_servicios WHERE id_cita = ?";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
         
         try (Connection conn = conectar();
              Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+             ResultSet rs = stmt.executeQuery(sql);
+             PreparedStatement pstmtServicios = conn.prepareStatement(sqlServicios)) {
             
             while (rs.next()) {
+                String idCita = rs.getString("id");
                 LocalDateTime fechaHora = LocalDateTime.parse(rs.getString("fecha_hora"), formatter);
                 controller.agendarCita(
-                    rs.getString("id"),
+                    idCita,
                     fechaHora,
                     rs.getString("motivo"),
                     rs.getString("id_mascota"),
@@ -412,9 +438,17 @@ public class PersistenciaSQLite {
                 );
                 
                 // Restaurar estado de la cita
-                Cita cita = controller.obtenerCita(rs.getString("id"));
+                Cita cita = controller.obtenerCita(idCita);
                 if (cita != null) {
                     cita.setEstado(rs.getString("estado"));
+                    
+                    // Cargar servicios de la cita
+                    pstmtServicios.setString(1, idCita);
+                    ResultSet rsServicios = pstmtServicios.executeQuery();
+                    while (rsServicios.next()) {
+                        controller.agregarServicioACita(idCita, rsServicios.getString("id_servicio"));
+                    }
+                    rsServicios.close();
                 }
             }
         } catch (SQLException e) {
@@ -441,6 +475,27 @@ public class PersistenciaSQLite {
             }
         } catch (SQLException e) {
             System.err.println("Error al cargar productos: " + e.getMessage());
+        }
+    }
+    
+    private void cargarServicios() {
+        String sql = "SELECT * FROM servicios";
+        
+        try (Connection conn = conectar();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            
+            while (rs.next()) {
+                // Usar agregarServicio para evitar duplicados con los predeterminados
+                controller.agregarServicio(
+                    rs.getString("id"),
+                    rs.getString("nombre"),
+                    rs.getString("descripcion"),
+                    rs.getDouble("precio")
+                );
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al cargar servicios: " + e.getMessage());
         }
     }
 }

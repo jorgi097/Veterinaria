@@ -53,11 +53,11 @@ public class VentanaPrincipal extends JFrame {
         
         if (!citasHoy.isEmpty()) {
             StringBuilder mensaje = new StringBuilder();
-            mensaje.append("📅 RECORDATORIO DE CITAS PARA HOY\n\n");
+            mensaje.append("RECORDATORIO DE CITAS PARA HOY\n\n");
             
             java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("HH:mm");
             for (model.Cita cita : citasHoy) {
-                mensaje.append("• ").append(cita.getFechaHora().format(formatter))
+                mensaje.append("- ").append(cita.getFechaHora().format(formatter))
                        .append(" - ").append(cita.getMascota().getNombre())
                        .append(" (Dueño: ").append(cita.getDueno().getNombre()).append(")")
                        .append(" - Dr. ").append(cita.getVeterinario().getNombre())

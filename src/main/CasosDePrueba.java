@@ -18,9 +18,9 @@ public class CasosDePrueba {
     public static void main(String[] args) {
         controller = ClinicaController.getInstance();
         
-        System.out.println("╔════════════════════════════════════════════════════╗");
-        System.out.println("║         CASOS DE PRUEBA DEL SISTEMA               ║");
-        System.out.println("╚════════════════════════════════════════════════════╝\n");
+        System.out.println("========================================================");
+        System.out.println("         CASOS DE PRUEBA DEL SISTEMA                   ");
+        System.out.println("========================================================\n");
         
         // Ejecutar casos de prueba
         caso1_RegistroExitosoMascotaConDueno();
@@ -30,17 +30,17 @@ public class CasosDePrueba {
         caso5_GestionHistorialClinico();
         
         // Reporte final
-        System.out.println("\n╔════════════════════════════════════════════════════╗");
-        System.out.println("║              RESUMEN DE PRUEBAS                    ║");
-        System.out.println("╚════════════════════════════════════════════════════╝");
+        System.out.println("\n========================================================");
+        System.out.println("              RESUMEN DE PRUEBAS                       ");
+        System.out.println("========================================================");
         System.out.println("Tests ejecutados: " + testsTotal);
         System.out.println("Tests pasados: " + testsPasados);
         System.out.println("Tests fallados: " + (testsTotal - testsPasados));
         
         if (testsPasados == testsTotal) {
-            System.out.println("\n✅ TODOS LOS TESTS PASARON EXITOSAMENTE");
+            System.out.println("\n[OK] TODOS LOS TESTS PASARON EXITOSAMENTE");
         } else {
-            System.out.println("\n❌ ALGUNOS TESTS FALLARON");
+            System.out.println("\n[ERROR] ALGUNOS TESTS FALLARON");
         }
     }
     
@@ -49,7 +49,7 @@ public class CasosDePrueba {
      * Objetivo: Validar que se puede registrar una mascota con un dueño válido
      */
     private static void caso1_RegistroExitosoMascotaConDueno() {
-        System.out.println("\n━━━ CASO 1: Registro exitoso de mascota con dueño ━━━");
+        System.out.println("\n--- CASO 1: Registro exitoso de mascota con dueno ---");
         testsTotal++;
         
         try {
@@ -69,15 +69,15 @@ public class CasosDePrueba {
                                       mascota.getDueno().getId().equals("D001");
             
             if (duenoRegistrado && mascotaRegistrada && relacionCorrecta) {
-                System.out.println("✅ PASÓ - Mascota registrada correctamente con su dueño");
-                System.out.println("   Dueño: " + mascota.getDueno().getNombre());
+                System.out.println("[OK] PASO - Mascota registrada correctamente con su dueno");
+                System.out.println("   Dueno: " + mascota.getDueno().getNombre());
                 System.out.println("   Mascota: " + mascota.getNombre() + " (" + mascota.getEspecie() + ")");
                 testsPasados++;
             } else {
-                System.out.println("❌ FALLÓ - Error en el registro");
+                System.out.println("[ERROR] FALLO - Error en el registro");
             }
         } catch (Exception e) {
-            System.out.println("❌ FALLÓ - Excepción: " + e.getMessage());
+            System.out.println("[ERROR] FALLO - Excepcion: " + e.getMessage());
         }
     }
     
@@ -86,7 +86,7 @@ public class CasosDePrueba {
      * Objetivo: Verificar que no se permitan citas duplicadas para un veterinario
      */
     private static void caso2_ValidacionCitaDuplicada() {
-        System.out.println("\n━━━ CASO 2: Validación de citas duplicadas ━━━");
+        System.out.println("\n--- CASO 2: Validacion de citas duplicadas ---");
         testsTotal++;
         
         try {
@@ -109,16 +109,16 @@ public class CasosDePrueba {
             );
             
             if (cita1 && !cita2) {
-                System.out.println("✅ PASÓ - Se previno correctamente la cita duplicada");
+                System.out.println("[OK] PASO - Se previno correctamente la cita duplicada");
                 System.out.println("   Primera cita: REGISTRADA");
                 System.out.println("   Segunda cita (mismo horario): RECHAZADA");
                 testsPasados++;
             } else {
-                System.out.println("❌ FALLÓ - No se validó correctamente");
+                System.out.println("[ERROR] FALLO - No se valido correctamente");
                 System.out.println("   Cita 1: " + cita1 + ", Cita 2: " + cita2);
             }
         } catch (Exception e) {
-            System.out.println("❌ FALLÓ - Excepción: " + e.getMessage());
+            System.out.println("[ERROR] FALLO - Excepcion: " + e.getMessage());
         }
     }
     
@@ -127,7 +127,7 @@ public class CasosDePrueba {
      * Objetivo: Validar que un dueño puede tener múltiples mascotas
      */
     private static void caso3_RelacionUnoAMuchos() {
-        System.out.println("\n━━━ CASO 3: Relación uno-a-muchos (Dueño-Mascotas) ━━━");
+        System.out.println("\n--- CASO 3: Relacion uno-a-muchos (Dueno-Mascotas) ---");
         testsTotal++;
         
         try {
@@ -146,18 +146,18 @@ public class CasosDePrueba {
             List<Mascota> mascotas = dueno.getMascotas();
             
             if (mascotas.size() == 3) {
-                System.out.println("✅ PASÓ - Relación uno-a-muchos funciona correctamente");
-                System.out.println("   Dueño: " + dueno.getNombre());
-                System.out.println("   Número de mascotas: " + mascotas.size());
+                System.out.println("[OK] PASO - Relacion uno-a-muchos funciona correctamente");
+                System.out.println("   Dueno: " + dueno.getNombre());
+                System.out.println("   Numero de mascotas: " + mascotas.size());
                 for (Mascota m : mascotas) {
                     System.out.println("     - " + m.getNombre() + " (" + m.getEspecie() + ")");
                 }
                 testsPasados++;
             } else {
-                System.out.println("❌ FALLÓ - Número incorrecto de mascotas: " + mascotas.size());
+                System.out.println("[ERROR] FALLO - Numero incorrecto de mascotas: " + mascotas.size());
             }
         } catch (Exception e) {
-            System.out.println("❌ FALLÓ - Excepción: " + e.getMessage());
+            System.out.println("[ERROR] FALLO - Excepcion: " + e.getMessage());
         }
     }
     
@@ -166,7 +166,7 @@ public class CasosDePrueba {
      * Objetivo: Verificar que el método realizarTarea() funciona polimórficamente
      */
     private static void caso4_PolimorfismoEmpleados() {
-        System.out.println("\n━━━ CASO 4: Polimorfismo en jerarquía de empleados ━━━");
+        System.out.println("\n--- CASO 4: Polimorfismo en jerarquia de empleados ---");
         testsTotal++;
         
         try {
@@ -194,26 +194,26 @@ public class CasosDePrueba {
                 tareaAsist.contains("Asistente") && tareaAsist.contains("apoyando");
             
             if (polimorfismoFunciona) {
-                System.out.println("✅ PASÓ - Polimorfismo funciona correctamente");
+                System.out.println("[OK] PASO - Polimorfismo funciona correctamente");
                 System.out.println("   Veterinario: " + tareaVet);
                 System.out.println("   Asistente: " + tareaAsist);
                 
-                // Demostrar sobrecarga de métodos
+                // Demostrar sobrecarga de metodos
                 if (vet instanceof Veterinario) {
                     Veterinario veterinario = (Veterinario) vet;
                     Mascota mascota = controller.obtenerMascota("M001");
                     if (mascota != null) {
-                        System.out.println("\n   Sobrecarga de métodos:");
+                        System.out.println("\n   Sobrecarga de metodos:");
                         System.out.println("   " + veterinario.diagnosticar(mascota));
                         System.out.println("   " + veterinario.diagnosticar(mascota, "fiebre alta"));
                     }
                 }
                 testsPasados++;
             } else {
-                System.out.println("❌ FALLÓ - Polimorfismo no funciona correctamente");
+                System.out.println("[ERROR] FALLO - Polimorfismo no funciona correctamente");
             }
         } catch (Exception e) {
-            System.out.println("❌ FALLÓ - Excepción: " + e.getMessage());
+            System.out.println("[ERROR] FALLO - Excepcion: " + e.getMessage());
         }
     }
     
@@ -222,7 +222,7 @@ public class CasosDePrueba {
      * Objetivo: Validar que se puede agregar y consultar el historial de una mascota
      */
     private static void caso5_GestionHistorialClinico() {
-        System.out.println("\n━━━ CASO 5: Gestión de historial clínico ━━━");
+        System.out.println("\n--- CASO 5: Gestion de historial clinico ---");
         testsTotal++;
         
         try {
@@ -236,19 +236,19 @@ public class CasosDePrueba {
             List<String> historial = mascota.getHistorialClinico();
             
             if (historial.size() >= 3) {
-                System.out.println("✅ PASÓ - Historial clínico gestionado correctamente");
+                System.out.println("[OK] PASO - Historial clinico gestionado correctamente");
                 System.out.println("   Mascota: " + mascota.getNombre());
                 System.out.println("   Registros en historial: " + historial.size());
-                System.out.println("   Últimos registros:");
+                System.out.println("   Ultimos registros:");
                 for (int i = Math.max(0, historial.size() - 3); i < historial.size(); i++) {
                     System.out.println("     " + historial.get(i));
                 }
                 testsPasados++;
             } else {
-                System.out.println("❌ FALLÓ - Historial incompleto: " + historial.size() + " registros");
+                System.out.println("[ERROR] FALLO - Historial incompleto: " + historial.size() + " registros");
             }
         } catch (Exception e) {
-            System.out.println("❌ FALLÓ - Excepción: " + e.getMessage());
+            System.out.println("[ERROR] FALLO - Excepcion: " + e.getMessage());
         }
     }
 }

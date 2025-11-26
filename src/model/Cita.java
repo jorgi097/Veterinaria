@@ -2,6 +2,8 @@ package model;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 // Clase que representa una cita médica en la clínica
 // Relaciona a una mascota, un dueño y un veterinario en una fecha/hora específica
@@ -14,6 +16,7 @@ public class Cita {
     private Dueno dueno; // Dueño de la mascota
     private Veterinario veterinario; // Veterinario que atenderá
     private String estado; // Estado de la cita: Programada, Completada, Cancelada
+    private List<Servicio> serviciosRealizados; // Lista de servicios asociados a la cita
     
     // Constructor de la clase Cita
     // Inicializa todas las relaciones y el estado predeterminado
@@ -27,6 +30,8 @@ public class Cita {
         this.veterinario = veterinario;
         // Estado inicial de toda cita nueva
         this.estado = "Programada";
+        // Inicializar lista de servicios vacía
+        this.serviciosRealizados = new ArrayList<>();
     }
     
     // ===== GETTERS Y SETTERS (Encapsulamiento) =====
@@ -85,6 +90,34 @@ public class Cita {
     
     public void setEstado(String estado) {
         this.estado = estado;
+    }
+    
+    // ===== MÉTODOS PARA SERVICIOS REALIZADOS =====
+    
+    // Obtiene la lista de servicios realizados en esta cita
+    public List<Servicio> getServiciosRealizados() {
+        return serviciosRealizados;
+    }
+    
+    // Agrega un servicio a la lista de servicios realizados
+    public void agregarServicio(Servicio servicio) {
+        if (servicio != null && !serviciosRealizados.contains(servicio)) {
+            serviciosRealizados.add(servicio);
+        }
+    }
+    
+    // Elimina un servicio de la lista de servicios realizados
+    public void eliminarServicio(Servicio servicio) {
+        serviciosRealizados.remove(servicio);
+    }
+    
+    // Calcula el total a cobrar por todos los servicios realizados
+    public double calcularTotal() {
+        double total = 0;
+        for (Servicio servicio : serviciosRealizados) {
+            total += servicio.getPrecio();
+        }
+        return total;
     }
     
     // Sobrescribe el método toString() para representación en texto

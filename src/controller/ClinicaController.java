@@ -358,6 +358,43 @@ public class ClinicaController {
         return true;
     }
     
+    // Agrega un servicio a una cita (para facturación)
+    // Retorna true si se agregó exitosamente
+    public boolean agregarServicioACita(String idCita, String idServicio) {
+        Cita cita = citas.get(idCita);
+        Servicio servicio = servicios.get(idServicio);
+        
+        if (cita == null || servicio == null) {
+            return false;
+        }
+        
+        cita.agregarServicio(servicio);
+        return true;
+    }
+    
+    // Elimina un servicio de una cita
+    // Retorna true si se eliminó exitosamente
+    public boolean eliminarServicioDeCita(String idCita, String idServicio) {
+        Cita cita = citas.get(idCita);
+        Servicio servicio = servicios.get(idServicio);
+        
+        if (cita == null || servicio == null) {
+            return false;
+        }
+        
+        cita.eliminarServicio(servicio);
+        return true;
+    }
+    
+    // Obtiene el total a cobrar por una cita
+    public double obtenerTotalCita(String idCita) {
+        Cita cita = citas.get(idCita);
+        if (cita == null) {
+            return 0;
+        }
+        return cita.calcularTotal();
+    }
+    
     // ============ GESTIÓN DE SERVICIOS ============
     
     // Obtiene un servicio por su ID
@@ -381,6 +418,29 @@ public class ClinicaController {
         }
         // Crear y agregar el nuevo servicio
         servicios.put(id, new Servicio(id, nombre, descripcion, precio));
+        return true;
+    }
+    
+    // Actualiza un servicio existente
+    // Retorna true si se actualizó, false si no existe
+    public boolean actualizarServicio(String id, String nombre, String descripcion, double precio) {
+        Servicio servicio = servicios.get(id);
+        if (servicio == null) {
+            return false;
+        }
+        servicio.setNombre(nombre);
+        servicio.setDescripcion(descripcion);
+        servicio.setPrecio(precio);
+        return true;
+    }
+    
+    // Elimina un servicio del catálogo
+    // Retorna true si se eliminó, false si no existe
+    public boolean eliminarServicio(String id) {
+        if (!servicios.containsKey(id)) {
+            return false;
+        }
+        servicios.remove(id);
         return true;
     }
     

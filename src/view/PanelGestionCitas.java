@@ -11,6 +11,7 @@ import model.*;
 
 // Panel de interfaz gráfica para gestionar citas médicas
 // Permite agendar, cancelar, completar y visualizar citas en una tabla
+// Incluye gestión de servicios realizados para facturación
 public class PanelGestionCitas extends JPanel {
     
     // Referencia al controlador para acceder a la lógica de negocio
@@ -21,6 +22,12 @@ public class PanelGestionCitas extends JPanel {
     private DefaultTableModel modeloTabla;
     // Campos de texto del formulario
     private JTextField txtId, txtFecha, txtMotivo, txtIdMascota, txtIdDueno, txtIdVeterinario;
+    
+    // Componentes para servicios de la cita
+    private JTable tablaServicios;
+    private DefaultTableModel modeloServicios;
+    private JComboBox<String> comboServicios;
+    private JLabel lblTotal;
     
     // Constructor del panel
     public PanelGestionCitas(ClinicaController controller) {
@@ -34,8 +41,7 @@ public class PanelGestionCitas extends JPanel {
         
         // Crear los componentes del panel
         crearPanelSuperior();
-        crearPanelFormulario();
-        crearTabla();
+        crearPanelCentral();
         // Cargar los datos iniciales en la tabla
         cargarDatos();
     }
@@ -56,8 +62,28 @@ public class PanelGestionCitas extends JPanel {
         add(panel, BorderLayout.NORTH);
     }
     
+    // Crea el panel central con formulario, tabla y servicios
+    private void crearPanelCentral() {
+        // Panel principal con división izquierda/derecha
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        splitPane.setResizeWeight(0.6);
+        
+        // Panel izquierdo: Formulario y tabla de citas
+        JPanel panelIzquierdo = new JPanel(new BorderLayout(5, 5));
+        panelIzquierdo.add(crearPanelFormulario(), BorderLayout.NORTH);
+        panelIzquierdo.add(crearTablaCitas(), BorderLayout.CENTER);
+        
+        // Panel derecho: Servicios de la cita
+        JPanel panelDerecho = crearPanelServicios();
+        
+        splitPane.setLeftComponent(panelIzquierdo);
+        splitPane.setRightComponent(panelDerecho);
+        
+        add(splitPane, BorderLayout.CENTER);
+    }
+    
     // Crea el formulario para ingresar datos de la cita
-    private void crearPanelFormulario() {
+    private JPanel crearPanelFormulario() {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(Color.WHITE);
         panel.setBorder(BorderFactory.createTitledBorder("Datos de la Cita"));
@@ -136,7 +162,7 @@ public class PanelGestionCitas extends JPanel {
         gbc.gridwidth = 4; // Ocupar todas las columnas
         panel.add(panelBotones, gbc);
         
-        add(panel, BorderLayout.NORTH);
+        return panel;
     }
     
     // Crea un botón con estilo personalizado
@@ -150,9 +176,9 @@ public class PanelGestionCitas extends JPanel {
     }
     
     // Crea la tabla para mostrar la lista de citas
-    private void crearTabla() {
+    private JScrollPane crearTablaCitas() {
         // Definir las columnas de la tabla
-        String[] columnas = {"ID", "Fecha/Hora", "Motivo", "Mascota", "Dueño", "Veterinario", "Estado"};
+        String[] columnas = {"ID", "Fecha/Hora", "Motivo", "Mascota", "Dueño", "Veterinario", "Estado", "Total"};
         // Crear modelo de tabla no editable
         modeloTabla = new DefaultTableModel(columnas, 0) {
             @Override
@@ -180,7 +206,150 @@ public class PanelGestionCitas extends JPanel {
         // Agregar la tabla dentro de un scroll pane
         JScrollPane scroll = new JScrollPane(tabla);
         scroll.setBorder(BorderFactory.createTitledBorder("Lista de Citas"));
-        add(scroll, BorderLayout.CENTER);
+        return scroll;
+    }
+    
+    // Crea el panel de servicios para la cita seleccionada
+    private JPanel crearPanelServicios() {
+        JPanel panel = new JPanel(new BorderLayout(5, 5));
+        panel.setBackground(Color.WHITE);
+        panel.setBorder(BorderFactory.createTitledBorder("Servicios de la Cita"));
+        
+        // Panel superior: ComboBox y botón para agregar servicio
+        JPanel panelAgregar = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelAgregar.setBackground(Color.WHITE);
+        
+        comboServicios = new JComboBox<>();
+        actualizarComboServicios();
+        
+        JButton btnAgregarServicio = crearBoton("Agregar", new Color(46, 204, 113));
+        JButton btnQuitarServicio = crearBoton("Quitar", new Color(231, 76, 60));
+        
+        btnAgregarServicio.addActionListener(e -> agregarServicioACita());
+        btnQuitarServicio.addActionListener(e -> quitarServicioDeCita());
+        
+        panelAgregar.add(new JLabel("Servicio:"));
+        panelAgregar.add(comboServicios);
+        panelAgregar.add(btnAgregarServicio);
+        panelAgregar.add(btnQuitarServicio);
+        
+        panel.add(panelAgregar, BorderLayout.NORTH);
+        
+        // Tabla de servicios de la cita
+        String[] columnas = {"ID", "Servicio", "Precio"};
+        modeloServicios = new DefaultTableModel(columnas, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+        
+        tablaServicios = new JTable(modeloServicios);
+        tablaServicios.setRowHeight(25);
+        tablaServicios.getTableHeader().setBackground(new Color(243, 156, 18));
+        tablaServicios.getTableHeader().setForeground(Color.WHITE);
+        
+        JScrollPane scrollServicios = new JScrollPane(tablaServicios);
+        panel.add(scrollServicios, BorderLayout.CENTER);
+        
+        // Panel inferior: Total
+        JPanel panelTotal = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        panelTotal.setBackground(new Color(243, 156, 18));
+        lblTotal = new JLabel("TOTAL: $0.00");
+        lblTotal.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        lblTotal.setForeground(Color.WHITE);
+        panelTotal.add(lblTotal);
+        
+        panel.add(panelTotal, BorderLayout.SOUTH);
+        
+        return panel;
+    }
+    
+    // Actualiza el combo de servicios disponibles
+    private void actualizarComboServicios() {
+        comboServicios.removeAllItems();
+        for (Servicio s : controller.listarServicios()) {
+            comboServicios.addItem(s.getId() + " - " + s.getNombre() + " ($" + s.getPrecio() + ")");
+        }
+    }
+    
+    // Agrega un servicio a la cita seleccionada
+    private void agregarServicioACita() {
+        if (txtId.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Seleccione una cita primero", 
+                "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        if (comboServicios.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(this, "Seleccione un servicio", 
+                "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        // Obtener el ID del servicio del combo
+        String seleccion = comboServicios.getSelectedItem().toString();
+        String idServicio = seleccion.split(" - ")[0];
+        
+        boolean exito = controller.agregarServicioACita(txtId.getText().trim(), idServicio);
+        
+        if (exito) {
+            cargarServiciosCita();
+            cargarDatos();
+            JOptionPane.showMessageDialog(this, "Servicio agregado a la cita", 
+                "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "Error al agregar servicio", 
+                "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    // Quita un servicio de la cita seleccionada
+    private void quitarServicioDeCita() {
+        if (txtId.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Seleccione una cita primero", 
+                "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        int filaServicio = tablaServicios.getSelectedRow();
+        if (filaServicio == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione un servicio de la tabla", 
+                "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        String idServicio = tablaServicios.getValueAt(filaServicio, 0).toString();
+        boolean exito = controller.eliminarServicioDeCita(txtId.getText().trim(), idServicio);
+        
+        if (exito) {
+            cargarServiciosCita();
+            cargarDatos();
+            JOptionPane.showMessageDialog(this, "Servicio eliminado de la cita", 
+                "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+    
+    // Carga los servicios de la cita seleccionada
+    private void cargarServiciosCita() {
+        modeloServicios.setRowCount(0);
+        
+        if (txtId.getText().trim().isEmpty()) {
+            lblTotal.setText("TOTAL: $0.00");
+            return;
+        }
+        
+        Cita cita = controller.obtenerCita(txtId.getText().trim());
+        if (cita != null) {
+            for (Servicio s : cita.getServiciosRealizados()) {
+                modeloServicios.addRow(new Object[]{
+                    s.getId(),
+                    s.getNombre(),
+                    String.format("$%.2f", s.getPrecio())
+                });
+            }
+            lblTotal.setText(String.format("TOTAL: $%.2f", cita.calcularTotal()));
+        }
     }
     
     // Carga todas las citas en la tabla
@@ -201,7 +370,8 @@ public class PanelGestionCitas extends JPanel {
                 cita.getMascota().getNombre(),
                 cita.getDueno().getNombre(),
                 cita.getVeterinario().getNombre(),
-                cita.getEstado()
+                cita.getEstado(),
+                String.format("$%.2f", cita.calcularTotal())
             });
         }
     }
@@ -214,8 +384,17 @@ public class PanelGestionCitas extends JPanel {
             txtId.setText(tabla.getValueAt(fila, 0).toString());
             txtFecha.setText(tabla.getValueAt(fila, 1).toString());
             txtMotivo.setText(tabla.getValueAt(fila, 2).toString());
-            // Nota: IDs de mascota, dueño y veterinario no se muestran en la tabla
-            // por lo que no se cargan automáticamente
+            
+            // Cargar IDs desde la cita real
+            Cita cita = controller.obtenerCita(txtId.getText().trim());
+            if (cita != null) {
+                txtIdMascota.setText(cita.getMascota().getId());
+                txtIdDueno.setText(cita.getDueno().getId());
+                txtIdVeterinario.setText(cita.getVeterinario().getId());
+            }
+            
+            // Cargar los servicios de esta cita
+            cargarServiciosCita();
         }
     }
     
@@ -294,5 +473,7 @@ public class PanelGestionCitas extends JPanel {
         txtIdDueno.setText("");
         txtIdVeterinario.setText("");
         tabla.clearSelection(); // Quitar selección de la tabla
+        modeloServicios.setRowCount(0);
+        lblTotal.setText("TOTAL: $0.00");
     }
 }

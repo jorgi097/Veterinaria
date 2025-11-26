@@ -8,7 +8,7 @@ Este proyecto requiere los siguientes archivos JAR:
 2. **slf4j-api-1.7.36.jar** - API de logging (dependencia de SQLite)
 3. **slf4j-simple-1.7.36.jar** - Implementación simple de logging
 
-### Descargar con PowerShell (recomendado)
+### Descargar con PowerShell
 
 Abra PowerShell en la carpeta del proyecto y ejecute:
 
@@ -25,15 +25,6 @@ Invoke-WebRequest -Uri "https://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.3
 # Descargar SLF4J Simple
 Invoke-WebRequest -Uri "https://repo1.maven.org/maven2/org/slf4j/slf4j-simple/1.7.36/slf4j-simple-1.7.36.jar" -OutFile "slf4j-simple-1.7.36.jar"
 ```
-
-### Descargar manualmente
-
-También puede descargar los archivos manualmente desde:
-- SQLite JDBC: https://repo1.maven.org/maven2/org/xerial/sqlite-jdbc/3.44.1.0/sqlite-jdbc-3.44.1.0.jar
-- SLF4J API: https://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar
-- SLF4J Simple: https://repo1.maven.org/maven2/org/slf4j/slf4j-simple/1.7.36/slf4j-simple-1.7.36.jar
-
-Coloque los 3 archivos .jar en la carpeta raíz del proyecto.
 
 ## Compilar
 
@@ -54,28 +45,11 @@ javac -cp "sqlite-jdbc-3.44.1.0.jar" -d bin -encoding UTF-8 -sourcepath src src/
 java -cp "bin;sqlite-jdbc-3.44.1.0.jar;slf4j-api-1.7.36.jar;slf4j-simple-1.7.36.jar" main.Main
 ```
 
-La aplicación abrirá la interfaz gráfica si todo se compiló correctamente.
-La base de datos `clinica.db` se creará automáticamente en la carpeta del proyecto.
-
-## Ejecutar casos de prueba
-
-```powershell
-# Ejecutar los casos de prueba
-java -cp "bin;sqlite-jdbc-3.44.1.0.jar;slf4j-api-1.7.36.jar;slf4j-simple-1.7.36.jar" main.CasosDePrueba
-```
-
 ## Limpieza (opcional)
 
-Para eliminar archivos compilados (`.class`) generados en `bin` puede usar:
+Para eliminar archivos compilados (`.class`):
 
 ```powershell
-# Eliminar todos los .class dentro de bin (use con precaución)
+# Eliminar todos los .class dentro de bin
 Remove-Item "bin\*\*.class" -Recurse -Force
-```
-
-O, si prefieres eliminar todo el contenido de `bin`:
-
-```powershell
-Remove-Item "bin\*" -Recurse -Force
-New-Item -ItemType Directory -Path bin | Out-Null
 ```
