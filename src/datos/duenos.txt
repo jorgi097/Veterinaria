@@ -1,3 +1,0 @@
-D003|Carlos López|Calle Sur 789|555-0003|carlos@email.com
-D002|María García|Av. Central 456|555-0002|maria@email.com
-D001|Juan Pérez|Calle Principal 123|555-0001|juan@email.com

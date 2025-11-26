@@ -17,7 +17,7 @@ public class PanelGestionMascotas extends JPanel {
     private DefaultTableModel modeloTabla;
     
     // Campos del formulario
-    private JTextField txtId, txtNombre, txtEspecie, txtRaza, txtEdad, txtPeso, txtIdDueno;
+    private JTextField txtId, txtNombre, txtEspecie, txtRaza, txtEdad, txtPeso, txtAlergias, txtIdDueno;
     private JButton btnAgregar, btnActualizar, btnEliminar, btnLimpiar, btnHistorial;
     
     public PanelGestionMascotas(ClinicaController controller) {
@@ -65,6 +65,7 @@ public class PanelGestionMascotas extends JPanel {
         txtRaza = new JTextField(12);
         txtEdad = new JTextField(12);
         txtPeso = new JTextField(12);
+        txtAlergias = new JTextField(12);
         txtIdDueno = new JTextField(12);
         
         // Fila 1
@@ -100,10 +101,15 @@ public class PanelGestionMascotas extends JPanel {
         gbc.gridx = 3;
         panelFormulario.add(txtPeso, gbc);
         
-        // Fila 4
+        // Fila 4 - Alergias (dato crítico para emergencias)
         gbc.gridx = 0; gbc.gridy = 3;
-        panelFormulario.add(new JLabel("ID Dueño:"), gbc);
+        panelFormulario.add(new JLabel("Alergias:"), gbc);
         gbc.gridx = 1;
+        panelFormulario.add(txtAlergias, gbc);
+        
+        gbc.gridx = 2;
+        panelFormulario.add(new JLabel("ID Dueño:"), gbc);
+        gbc.gridx = 3;
         panelFormulario.add(txtIdDueno, gbc);
         
         // Panel de botones
@@ -128,7 +134,7 @@ public class PanelGestionMascotas extends JPanel {
         panelBotones.add(btnHistorial);
         panelBotones.add(btnLimpiar);
         
-        gbc.gridx = 0; gbc.gridy = 4;
+        gbc.gridx = 0; gbc.gridy = 5;
         gbc.gridwidth = 4;
         panelFormulario.add(panelBotones, gbc);
         
@@ -146,7 +152,7 @@ public class PanelGestionMascotas extends JPanel {
     }
     
     private void crearTabla() {
-        String[] columnas = {"ID", "Nombre", "Especie", "Raza", "Edad", "Peso", "Dueño"};
+        String[] columnas = {"ID", "Nombre", "Especie", "Raza", "Edad", "Peso", "Alergias", "Dueño"};
         modeloTabla = new DefaultTableModel(columnas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -185,6 +191,7 @@ public class PanelGestionMascotas extends JPanel {
                 mascota.getRaza(),
                 mascota.getEdad(),
                 mascota.getPeso(),
+                mascota.getAlergias(),
                 mascota.getDueno() != null ? mascota.getDueno().getNombre() : "N/A"
             };
             modeloTabla.addRow(fila);
@@ -204,6 +211,7 @@ public class PanelGestionMascotas extends JPanel {
                 txtRaza.setText(mascota.getRaza());
                 txtEdad.setText(String.valueOf(mascota.getEdad()));
                 txtPeso.setText(String.valueOf(mascota.getPeso()));
+                txtAlergias.setText(mascota.getAlergias());
                 txtIdDueno.setText(mascota.getDueno().getId());
                 txtId.setEditable(false);
             }
@@ -223,6 +231,7 @@ public class PanelGestionMascotas extends JPanel {
                     txtRaza.getText().trim(),
                     edad,
                     peso,
+                    txtAlergias.getText().trim(),
                     txtIdDueno.getText().trim()
                 );
                 
@@ -260,7 +269,8 @@ public class PanelGestionMascotas extends JPanel {
                     txtEspecie.getText().trim(),
                     txtRaza.getText().trim(),
                     edad,
-                    peso
+                    peso,
+                    txtAlergias.getText().trim()
                 );
                 
                 if (exito) {
@@ -345,6 +355,7 @@ public class PanelGestionMascotas extends JPanel {
             txtRaza.getText().trim().isEmpty() ||
             txtEdad.getText().trim().isEmpty() ||
             txtPeso.getText().trim().isEmpty() ||
+            txtAlergias.getText().trim().isEmpty() ||
             txtIdDueno.getText().trim().isEmpty()) {
             
             JOptionPane.showMessageDialog(this, 
@@ -363,6 +374,7 @@ public class PanelGestionMascotas extends JPanel {
         txtRaza.setText("");
         txtEdad.setText("");
         txtPeso.setText("");
+        txtAlergias.setText("");
         txtIdDueno.setText("");
         txtId.setEditable(true);
         tablaMascotas.clearSelection();

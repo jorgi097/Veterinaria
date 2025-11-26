@@ -2,16 +2,17 @@ package view;
 
 import controller.ClinicaController;
 import java.awt.*;
+import java.util.List;
 import javax.swing.*;
-import utils.PersistenciaArchivos;
+import utils.PersistenciaSQLite;
 
 // Ventana principal del sistema con interfaz gráfica
 public class VentanaPrincipal extends JFrame {
     
     // Controlador principal del sistema
     private final ClinicaController controller;
-    // Maneja la persistencia de datos en archivos
-    private final PersistenciaArchivos persistencia;
+    // Maneja la persistencia de datos en SQLite
+    private final PersistenciaSQLite persistencia;
     
     // Panel principal que contiene todos los demás paneles
     private JPanel panelPrincipal;
@@ -20,10 +21,10 @@ public class VentanaPrincipal extends JFrame {
     public VentanaPrincipal() {
         // Obtener la instancia única del controlador (patrón Singleton)
         this.controller = ClinicaController.getInstance();
-        // Crear el manejador de persistencia
-        this.persistencia = new PersistenciaArchivos(controller);
+        // Crear el manejador de persistencia con SQLite
+        this.persistencia = new PersistenciaSQLite(controller);
         
-        // Cargar los datos guardados previamente desde los archivos
+        // Cargar los datos guardados previamente desde la base de datos
         persistencia.cargarTodo();
         
         // Configurar las propiedades básicas de la ventana
@@ -37,6 +38,37 @@ public class VentanaPrincipal extends JFrame {
         setLocationRelativeTo(null);
         // Hacer visible la ventana
         setVisible(true);
+        
+        // Mostrar alertas de citas del día (recordatorios automáticos)
+        mostrarRecordatoriosCitas();
+    }
+    
+    // Muestra un popup con recordatorios de citas programadas para hoy
+    private void mostrarRecordatoriosCitas() {
+        java.time.LocalDate hoy = java.time.LocalDate.now();
+        List<model.Cita> citasHoy = controller.listarCitas().stream()
+                .filter(c -> c.getFechaHora().toLocalDate().equals(hoy))
+                .filter(c -> c.getEstado().equals("Programada"))
+                .collect(java.util.stream.Collectors.toList());
+        
+        if (!citasHoy.isEmpty()) {
+            StringBuilder mensaje = new StringBuilder();
+            mensaje.append("📅 RECORDATORIO DE CITAS PARA HOY\n\n");
+            
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("HH:mm");
+            for (model.Cita cita : citasHoy) {
+                mensaje.append("• ").append(cita.getFechaHora().format(formatter))
+                       .append(" - ").append(cita.getMascota().getNombre())
+                       .append(" (Dueño: ").append(cita.getDueno().getNombre()).append(")")
+                       .append(" - Dr. ").append(cita.getVeterinario().getNombre())
+                       .append("\n");
+            }
+            
+            JOptionPane.showMessageDialog(this, 
+                mensaje.toString(), 
+                "Citas Programadas", 
+                JOptionPane.INFORMATION_MESSAGE);
+        }
     }
     
     // Configura las propiedades iniciales de la ventana
@@ -133,19 +165,17 @@ public class VentanaPrincipal extends JFrame {
         // Opción para ver servicios disponibles
         menuServicios.add(crearMenuItem("Ver Servicios", "icons/list.png", e -> mostrarServicios()));
         
+        // ===== MENÚ INVENTARIO =====
+        JMenu menuInventario = crearMenu("Inventario", "icons/inventory.png");
+        // Opción para gestionar el inventario de productos
+        menuInventario.add(crearMenuItem("Gestionar Inventario", "icons/manage.png", e -> mostrarGestionInventario()));
+        
         // ===== MENÚ REPORTES =====
         JMenu menuReportes = crearMenu("Reportes", "icons/report.png");
         // Opción para ver reporte de citas por veterinario
         menuReportes.add(crearMenuItem("Citas por Veterinario", "icons/chart.png", e -> mostrarReporteCitas()));
         // Opción para ver reporte de mascotas por dueño
         menuReportes.add(crearMenuItem("Mascotas por Dueño", "icons/chart.png", e -> mostrarReporteMascotas()));
-        
-        // ===== MENÚ AYUDA =====
-        JMenu menuAyuda = crearMenu("Ayuda", "icons/help.png");
-        // Opción para mostrar información del sistema
-        menuAyuda.add(crearMenuItem("Acerca de", "icons/info.png", e -> mostrarAcercaDe()));
-        // Opción para demostrar polimorfismo (concepto de POO)
-        menuAyuda.add(crearMenuItem("Demostración Polimorfismo", "icons/demo.png", e -> mostrarDemoPolimorfismo()));
         
         // Agregar todos los menús a la barra de menú
         menuBar.add(menuArchivo);
@@ -154,8 +184,8 @@ public class VentanaPrincipal extends JFrame {
         menuBar.add(menuEmpleados);
         menuBar.add(menuCitas);
         menuBar.add(menuServicios);
+        menuBar.add(menuInventario);
         menuBar.add(menuReportes);
-        menuBar.add(menuAyuda);
         
         // Establecer la barra de menú en la ventana
         setJMenuBar(menuBar);
@@ -346,6 +376,14 @@ public class VentanaPrincipal extends JFrame {
         panelPrincipal.repaint();
     }
     
+    // Muestra el panel de gestión de inventario
+    private void mostrarGestionInventario() {
+        panelPrincipal.removeAll();
+        panelPrincipal.add(new PanelGestionInventario(controller), BorderLayout.CENTER);
+        panelPrincipal.revalidate();
+        panelPrincipal.repaint();
+    }
+    
     // Muestra el reporte de citas de un veterinario específico
     private void mostrarReporteCitas() {
         // Solicitar al usuario el ID del veterinario
@@ -372,53 +410,5 @@ public class VentanaPrincipal extends JFrame {
             panelPrincipal.revalidate();
             panelPrincipal.repaint();
         }
-    }
-    
-    // Muestra una demostración del concepto de polimorfismo con empleados
-    private void mostrarDemoPolimorfismo() {
-        // Construir el texto de demostración
-        StringBuilder sb = new StringBuilder();
-        sb.append("DEMOSTRACIÓN DE POLIMORFISMO\n\n");
-        sb.append("Ejecutando método realizarTarea() para cada empleado:\n\n");
-        
-        // Obtener la tarea de cada empleado (veterinarios y asistentes)
-        // Cada tipo de empleado ejecuta su propia implementación del método
-        controller.listarEmpleados().forEach(emp -> {
-            sb.append(emp.realizarTarea()).append("\n\n");
-        });
-        
-        // Crear área de texto para mostrar el resultado
-        JTextArea textArea = new JTextArea(sb.toString());
-        // No permitir edición
-        textArea.setEditable(false);
-        // Fuente monoespaciada para mejor visualización
-        textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        
-        // Agregar scroll al área de texto
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setPreferredSize(new Dimension(600, 400));
-        
-        // Mostrar diálogo con la demostración
-        JOptionPane.showMessageDialog(this, scrollPane, 
-            "Demostración de Polimorfismo", JOptionPane.INFORMATION_MESSAGE);
-    }
-    
-    // Muestra información acerca del sistema
-    private void mostrarAcercaDe() {
-        JOptionPane.showMessageDialog(this,
-            "<html><h2>Sistema de Gestión - Clínica Veterinaria</h2>" +
-            "<p><b>Versión:</b> 1.0</p>" +
-            "<p><b>Desarrollado en:</b> Java con Swing</p>" +
-            "<p><b>Características:</b></p>" +
-            "<ul>" +
-            "<li>Gestión completa de mascotas y dueños</li>" +
-            "<li>Control de personal (veterinarios y asistentes)</li>" +
-            "<li>Agendamiento de citas</li>" +
-            "<li>Persistencia de datos</li>" +
-            "<li>Aplicación de principios POO</li>" +
-            "</ul>" +
-            "<p><b>Fecha:</b> Octubre 2025</p></html>",
-            "Acerca de",
-            JOptionPane.INFORMATION_MESSAGE);
     }
 }

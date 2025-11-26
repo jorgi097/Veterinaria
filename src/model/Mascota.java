@@ -13,6 +13,7 @@ public class Mascota {
     private String raza;
     private int edad;
     private double peso;
+    private String alergias; // Campo para alergias (dato crítico para emergencias)
     // Lista que almacena el historial clínico de la mascota
     private List<String> historialClinico;
     // Relación con el dueño (asociación)
@@ -20,13 +21,14 @@ public class Mascota {
     
     // Constructor de la clase Mascota
     // Inicializa todos los atributos incluyendo la relación con el dueño
-    public Mascota(String id, String nombre, String especie, String raza, int edad, double peso, Dueno dueno) {
+    public Mascota(String id, String nombre, String especie, String raza, int edad, double peso, String alergias, Dueno dueno) {
         this.id = id;
         this.nombre = nombre;
         this.especie = especie;
         this.raza = raza;
         this.edad = edad;
         this.peso = peso;
+        this.alergias = alergias;
         this.dueno = dueno;
         // Inicializar la lista de historial clínico vacía
         this.historialClinico = new ArrayList<>();
@@ -83,6 +85,16 @@ public class Mascota {
         this.peso = peso;
     }
     
+    // Retorna las alergias de la mascota
+    public String getAlergias() {
+        return alergias;
+    }
+    
+    // Establece o actualiza las alergias de la mascota
+    public void setAlergias(String alergias) {
+        this.alergias = alergias;
+    }
+    
     // Retorna la lista completa del historial clínico
     public List<String> getHistorialClinico() {
         return historialClinico;
@@ -114,6 +126,7 @@ public class Mascota {
                 ", raza='" + raza + '\'' +
                 ", edad=" + edad +
                 ", peso=" + peso +
+                ", alergias='" + alergias + '\'' +
                 ", dueño=" + (dueno != null ? dueno.getNombre() : "Sin dueño") +
                 '}';
     }

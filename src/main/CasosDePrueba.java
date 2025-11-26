@@ -58,9 +58,9 @@ public class CasosDePrueba {
                 "D001", "Ana López", "Calle 123", "555-0001", "ana@email.com"
             );
             
-            // Registrar mascota
+            // Registrar mascota (incluyendo alergias como dato crítico)
             boolean mascotaRegistrada = controller.registrarMascota(
-                "M001", "Firulais", "Perro", "Golden Retriever", 3, 28.5, "D001"
+                "M001", "Firulais", "Perro", "Golden Retriever", 3, 28.5, "Ninguna", "D001"
             );
             
             // Verificar que la mascota se registró correctamente
@@ -136,10 +136,10 @@ public class CasosDePrueba {
                 "D002", "Pedro Gómez", "Av. Principal 456", "555-0002", "pedro@email.com"
             );
             
-            // Registrar múltiples mascotas para el mismo dueño
-            controller.registrarMascota("M002", "Luna", "Gato", "Persa", 2, 4.5, "D002");
-            controller.registrarMascota("M003", "Max", "Perro", "Beagle", 4, 12.0, "D002");
-            controller.registrarMascota("M004", "Coco", "Loro", "Guacamayo", 1, 0.8, "D002");
+            // Registrar múltiples mascotas para el mismo dueño (con alergias)
+            controller.registrarMascota("M002", "Luna", "Gato", "Persa", 2, 4.5, "Alergia a penicilina", "D002");
+            controller.registrarMascota("M003", "Max", "Perro", "Beagle", 4, 12.0, "Ninguna", "D002");
+            controller.registrarMascota("M004", "Coco", "Loro", "Guacamayo", 1, 0.8, "Ninguna", "D002");
             
             // Obtener dueño y verificar sus mascotas
             Dueno dueno = controller.obtenerDueno("D002");

@@ -21,6 +21,7 @@ public class ClinicaController {
     private Map<String, Empleado> empleados;
     private Map<String, Cita> citas;
     private Map<String, Servicio> servicios;
+    private Map<String, Producto> productos; // Nuevo mapa para inventario
     
     // Constructor privado para implementar Singleton
     // Solo se puede crear una instancia desde dentro de la clase
@@ -31,6 +32,7 @@ public class ClinicaController {
         empleados = new HashMap<>();
         citas = new HashMap<>();
         servicios = new HashMap<>();
+        productos = new HashMap<>();
         // Cargar los servicios predeterminados
         inicializarServicios();
     }
@@ -117,7 +119,7 @@ public class ClinicaController {
     // La mascota debe estar asociada a un dueño existente
     // Retorna true si el registro fue exitoso, false si el ID ya existe o el dueño no existe
     public boolean registrarMascota(String id, String nombre, String especie, String raza, 
-                                   int edad, double peso, String idDueno) {
+                                   int edad, double peso, String alergias, String idDueno) {
         // Verificar que el ID de la mascota no esté duplicado
         if (mascotas.containsKey(id)) {
             return false;
@@ -129,7 +131,7 @@ public class ClinicaController {
             return false;
         }
         // Crear nueva mascota con su dueño
-        Mascota mascota = new Mascota(id, nombre, especie, raza, edad, peso, dueno);
+        Mascota mascota = new Mascota(id, nombre, especie, raza, edad, peso, alergias, dueno);
         // Agregar al mapa de mascotas
         mascotas.put(id, mascota);
         // Agregar la mascota a la lista del dueño (relación bidireccional)
@@ -152,7 +154,7 @@ public class ClinicaController {
     // Actualiza la información de una mascota existente
     // Retorna true si la actualización fue exitosa, false si la mascota no existe
     public boolean actualizarMascota(String id, String nombre, String especie, String raza, 
-                                    int edad, double peso) {
+                                    int edad, double peso, String alergias) {
         Mascota mascota = mascotas.get(id);
         // Verificar que la mascota exista
         if (mascota == null) {
@@ -164,6 +166,7 @@ public class ClinicaController {
         mascota.setRaza(raza);
         mascota.setEdad(edad);
         mascota.setPeso(peso);
+        mascota.setAlergias(alergias);
         return true;
     }
     
@@ -406,5 +409,75 @@ public class ClinicaController {
             // Llamada polimórfica: cada empleado ejecuta su propia implementación
             System.out.println(empleado.realizarTarea());
         }
+    }
+    
+    // ============ GESTIÓN DE INVENTARIO ============
+    
+    // Registra un nuevo producto en el inventario
+    // Retorna true si el registro fue exitoso, false si el ID ya existe
+    public boolean registrarProducto(String id, String nombre, String categoria, 
+                                    int cantidad, int cantidadMinima, double precio) {
+        // Verificar que el ID no esté duplicado
+        if (productos.containsKey(id)) {
+            return false;
+        }
+        // Crear nuevo producto
+        Producto producto = new Producto(id, nombre, categoria, cantidad, cantidadMinima, precio);
+        // Agregar al mapa de productos
+        productos.put(id, producto);
+        return true;
+    }
+    
+    // Obtiene un producto por su ID
+    // Retorna el objeto Producto o null si no existe
+    public Producto obtenerProducto(String id) {
+        return productos.get(id);
+    }
+    
+    // Lista todos los productos del inventario
+    // Retorna una lista con todos los productos
+    public List<Producto> listarProductos() {
+        return new ArrayList<>(productos.values());
+    }
+    
+    // Actualiza un producto existente
+    // Retorna true si la actualización fue exitosa, false si no existe
+    public boolean actualizarProducto(String id, String nombre, String categoria, 
+                                     int cantidad, int cantidadMinima, double precio) {
+        Producto producto = productos.get(id);
+        if (producto == null) {
+            return false;
+        }
+        producto.setNombre(nombre);
+        producto.setCategoria(categoria);
+        producto.setCantidad(cantidad);
+        producto.setCantidadMinima(cantidadMinima);
+        producto.setPrecio(precio);
+        return true;
+    }
+    
+    // Elimina un producto del inventario
+    // Retorna true si se eliminó, false si no existe
+    public boolean eliminarProducto(String id) {
+        if (!productos.containsKey(id)) {
+            return false;
+        }
+        productos.remove(id);
+        return true;
+    }
+    
+    // Obtiene la lista de productos con stock bajo
+    // Retorna los productos cuya cantidad es menor o igual a la cantidad mínima
+    public List<Producto> obtenerProductosConStockBajo() {
+        return productos.values().stream()
+                .filter(Producto::tieneStockBajo)
+                .collect(Collectors.toList());
+    }
+    
+    // Verifica si hay productos con stock bajo
+    // Retorna true si hay al menos un producto con stock bajo
+    public boolean hayAlertasInventario() {
+        return productos.values().stream()
+                .anyMatch(Producto::tieneStockBajo);
     }
 }

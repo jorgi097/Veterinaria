@@ -2,7 +2,7 @@ package main;
 
 import controller.ClinicaController;
 import javax.swing.*;
-import utils.PersistenciaArchivos;
+import utils.PersistenciaSQLite;
 import view.VentanaPrincipal;
 
 // Clase principal del sistema
@@ -12,10 +12,10 @@ public class Main {
         // Obtener la instancia única del controlador (patrón Singleton)
         ClinicaController controller = ClinicaController.getInstance();
         
-        // Inicializar el sistema de persistencia para cargar/guardar datos
-        PersistenciaArchivos persistencia = new PersistenciaArchivos(controller);
+        // Inicializar el sistema de persistencia SQLite para cargar/guardar datos
+        PersistenciaSQLite persistencia = new PersistenciaSQLite(controller);
         
-        // Cargar los datos guardados previamente desde los archivos
+        // Cargar los datos guardados previamente desde la base de datos
         persistencia.cargarTodo();
         
         // Si no hay datos cargados, cargar datos de ejemplo para demostración
@@ -42,11 +42,11 @@ public class Main {
         controller.registrarDueno("D002", "María García", "Av. Central 456", "555-0002", "maria@email.com");
         controller.registrarDueno("D003", "Carlos López", "Calle Sur 789", "555-0003", "carlos@email.com");
         
-        // ===== REGISTRAR MASCOTAS =====
-        controller.registrarMascota("M001", "Max", "Perro", "Labrador", 3, 30.5, "D001");
-        controller.registrarMascota("M002", "Luna", "Gato", "Siamés", 2, 4.2, "D001");
-        controller.registrarMascota("M003", "Rocky", "Perro", "Pastor Alemán", 5, 35.0, "D002");
-        controller.registrarMascota("M004", "Michi", "Gato", "Persa", 1, 3.8, "D003");
+        // ===== REGISTRAR MASCOTAS (con alergias según requerimiento) =====
+        controller.registrarMascota("M001", "Max", "Perro", "Labrador", 3, 30.5, "Ninguna", "D001");
+        controller.registrarMascota("M002", "Luna", "Gato", "Siamés", 2, 4.2, "Alergia a penicilina", "D001");
+        controller.registrarMascota("M003", "Rocky", "Perro", "Pastor Alemán", 5, 35.0, "Alergia al pollo", "D002");
+        controller.registrarMascota("M004", "Michi", "Gato", "Persa", 1, 3.8, "Ninguna", "D003");
         
         // ===== AGREGAR HISTORIAL CLÍNICO =====
         controller.agregarHistorialClinico("M001", "2024-10-15 - Vacuna antirrábica aplicada");
@@ -57,7 +57,7 @@ public class Main {
         // Veterinarios
         controller.registrarVeterinario("V001", "Dr. Ana Martínez", "ana@clinica.com", "555-1001", "Lun-Vie 8:00-16:00", "Cirugía");
         controller.registrarVeterinario("V002", "Dr. Pedro Sánchez", "pedro@clinica.com", "555-1002", "Lun-Vie 14:00-22:00", "Medicina General");
-        // Asistentes
+        // Asistentes (Recepcionistas según requerimiento)
         controller.registrarAsistente("A001", "Laura Torres", "laura@clinica.com", "555-2001", "Lun-Vie 8:00-16:00", "Recepción");
         controller.registrarAsistente("A002", "Miguel Ríos", "miguel@clinica.com", "555-2002", "Lun-Vie 14:00-22:00", "Asistencia Quirúrgica");
         
@@ -71,5 +71,18 @@ public class Main {
         controller.agendarCita("C001", fecha1, "Vacunación anual", "M001", "D001", "V001");
         controller.agendarCita("C002", fecha2, "Consulta de rutina", "M003", "D002", "V002");
         controller.agendarCita("C003", fecha3, "Control post-operatorio", "M002", "D001", "V001");
+        
+        // ===== REGISTRAR PRODUCTOS DE INVENTARIO =====
+        // Vacunas
+        controller.registrarProducto("P001", "Vacuna Antirrábica", "Vacunas", 15, 10, 150.0);
+        controller.registrarProducto("P002", "Vacuna Parvovirus", "Vacunas", 8, 10, 180.0); // Stock bajo para demo
+        // Medicamentos
+        controller.registrarProducto("P003", "Antibiótico Amoxicilina", "Medicamentos", 25, 15, 85.0);
+        controller.registrarProducto("P004", "Desparasitante", "Medicamentos", 5, 10, 45.0); // Stock bajo para demo
+        // Alimentos
+        controller.registrarProducto("P005", "Alimento Premium Perro", "Alimentos", 30, 20, 350.0);
+        controller.registrarProducto("P006", "Alimento Premium Gato", "Alimentos", 25, 20, 320.0);
+        // Accesorios
+        controller.registrarProducto("P007", "Collar Antipulgas", "Accesorios", 40, 15, 120.0);
     }
 }

@@ -1,3 +1,0 @@
-C002|16/11/2024 15:30|Consulta de rutina|M003|D002|V002|Programada
-C001|15/11/2024 10:00|Vacunación anual|M001|D001|V001|Programada
-C003|17/11/2024 11:00|Control post-operatorio|M002|D001|V001|Programada
